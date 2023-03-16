@@ -1,36 +1,41 @@
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 import User from "../models/User.js"
-
+import cloudinary from "cloudinary"
 const registerUser = async (req, res) =>{
-
     const url = req.protocol + '://' + req.get('host')
+  
     try{
         const {
             firstName,
             lastName,
             email,
             password,
-            picturePath,
+            image,
             friends,
             location,
             occupation
         } = req.body
+       
+
         const userAlreadyExist = await User.findOne({email:email})
         if(userAlreadyExist){
             res.status(409).send("USER ALREADY EXIST")
         }
         else{
+            const cloud = await cloudinary.uploader.upload(image)
             const salt = await bcryptjs.genSalt();
             const hashPassword = await bcryptjs.hash(password, salt)
-    
             const newUser =
                 {
                     firstName,
                     lastName,
                     email,
                     password: hashPassword,
-                    picturePath: url + '/public/' + picturePath,
+                    picturePath: {
+                        public_id: cloud.public_id,
+                        url: cloud.secure_url,
+                    },
                     friends,
                     location,
                     occupation,

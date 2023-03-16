@@ -42,6 +42,26 @@ const MyPostWidget = ({picturePath}) => {
   const medium = palette.neutral.medium;
   const URL = "http://127.0.0.1:5000"
 
+
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      if (file && file.type.match('image.*')) {
+        fileReader.readAsDataURL(file);
+      }
+
+      fileReader.onload = () => {
+        resolve(fileReader.result)
+      }
+
+      
+      fileReader.onerror = (error) => {
+        reject(error)
+      }
+
+    })
+  }
+
   const handlePost = async () => {
     const config = {
       headers:{
@@ -49,19 +69,21 @@ const MyPostWidget = ({picturePath}) => {
         Authorization: `Bearer ${token}`
       }
     }
+    
     const pictureData = image ? image : image.name;
+    const base64 = await convertBase64(pictureData)
 
     const postData = JSON.stringify({
       userID: _id,
       description: post,
-      picture: pictureData,
+      image: base64,
     })
 
     try{
       const api = axios.create({
         baseURL: URL,
       })
-  
+   
       const {data} = await api.post("/post", postData, config)
       if(data){
         console.log(data)

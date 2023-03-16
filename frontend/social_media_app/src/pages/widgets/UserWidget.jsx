@@ -11,9 +11,10 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { Box, Typography, Divider, useTheme } from "@mui/material";
 import UserImage from "../../components/UserImage";
 import FlexBetween from "../../components/FlexBetween";
-  import { useSelector } from "react-redux";
+
   import { useEffect, useState } from "react";
   import { useNavigate } from "react-router-dom";
+  import { useSelector } from "react-redux";
   import axios from "axios";
   
   const UserWidget = ({ userId, picturePath }) => {

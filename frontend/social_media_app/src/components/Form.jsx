@@ -31,6 +31,24 @@ const Form = () => {
   const [password, setPassword] = useState("");
   const URL = "http://127.0.0.1:5000"
 
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      if (file && file.type.match('image.*')) {
+        fileReader.readAsDataURL(file);
+      }
+
+      fileReader.onload = () => {
+        resolve(fileReader.result)
+      }
+
+      
+      fileReader.onerror = (error) => {
+        reject(error)
+      }
+
+    })
+  }
   const login = async () => {
     const config = {
       headers: {
@@ -69,10 +87,11 @@ const Form = () => {
 
 
   const register = async () => {
-    setPicture(document.getElementById("image").files[0].name);
+    setPicture(document.getElementById("image").files[0]);
+    const base64 = await convertBase64(picture)
     const config = {
       headers: {
-        'content-type': 'application/json',
+        'content-type': 'multipart/form-data',
       }
     }
    const formData = new FormData();
@@ -81,7 +100,7 @@ const Form = () => {
    formData.append("lastName", lastName)
    formData.append("location", location)
    formData.append("occupation", occupation)
-   formData.append("picturePath", picture)
+   formData.append("image", base64)
    formData.append("email", email)
    formData.append("password", password)
     
@@ -114,7 +133,7 @@ const Form = () => {
 
   return (
   
-        <form action="/register" encType='multipart/form-data' onSubmit={(e) => e.preventDefault()}>
+        <>
           <Box
             width={"100%"}
             display="flex"
@@ -262,7 +281,7 @@ const Form = () => {
                 : "Already have an account? Login here."}
             </Typography>
           </Box>
-        </form>
+        </>
   )
 }
 
